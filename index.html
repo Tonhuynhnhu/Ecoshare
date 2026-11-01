@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECO-SHARE - Điều phối vận tải thông minh</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Font: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome 6 Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            green: '#15803d',
+                            greenHover: '#166534',
+                            blue: '#2563eb',
+                            blueHover: '#1d4ed8'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .nav-btn.active {
+            color: #15803d;
+            border-bottom: 3px solid #15803d;
+            font-weight: 700;
+        }
+        /* Style cho modal */
+        .modal {
+            transition: opacity 0.25s ease;
+        }
+        body.modal-active {
+            overflow-x: hidden;
+            overflow-y: hidden !important;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
+
+    <!-- HEADER / NAVIGATION -->
+    <header class="bg-white shadow-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                
+                <!-- SVG LOGO CHUẨN NHẬN DIỆN ECO-SHARE -->
+                <div class="flex-shrink-0 cursor-pointer" onclick="switchTab('home')">
+                    <svg width="220" height="55" viewBox="0 0 320 80" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-12 w-auto">
+                        <!-- BIỂU TƯỢNG BÊN TRÁI -->
+                        <g id="logo-icon">
+                            <!-- Đường cong mũi tên hướng tới phía trên -->
+                            <path d="M 15 32 Q 40 10 70 25" stroke="#15803d" stroke-width="3" fill="none" stroke-linecap="round"/>
+                            <polygon points="70,25 62,20 64,28" fill="#15803d" />
+                            
+                            <!-- Xe tải giao hàng màu xanh dương -->
+                            <g id="truck" fill="#2563eb">
+                                <rect x="25" y="16" width="22" height="13" rx="2"/>
+                                <path d="M 47 21 L 55 21 L 58 25 L 58 29 L 47 29 Z" />
+                                <circle cx="32" cy="30" r="3" fill="#1e293b"/>
+                                <circle cx="52" cy="30" r="3" fill="#1e293b"/>
+                            </g>
+
+                            <!-- Chữ E cách điệu màu xanh lá -->
+                            <text x="14" y="58" font-family="'Plus Jakarta Sans', sans-serif" font-size="28" font-weight="800" fill="#15803d">E</text>
+                            
+                            <!-- Chữ S cách điệu màu xanh dương -->
+                            <text x="36" y="58" font-family="'Plus Jakarta Sans', sans-serif" font-size="28" font-weight="800" fill="#2563eb">S</text>
+
+                            <!-- Đoạn đường uốn cong xanh lá phía dưới -->
+                            <path d="M 10 65 Q 40 75 75 63" stroke="#15803d" stroke-width="8" fill="none" stroke-linecap="round"/>
+                            <!-- Vạch kẻ đường màu trắng -->
+                            <path d="M 18 66 Q 40 73 68 64" stroke="#ffffff" stroke-width="1.5" stroke-dasharray="4,4" fill="none"/>
+                        </g>
+
+                        <!-- CHỮ THƯƠNG HIỆU BÊN PHẢI -->
+                        <g id="logo-text">
+                            <!-- Chiếc lá nhỏ màu xanh lá phía trên chữ SHARE -->
+                            <path d="M 235 15 C 235 8 245 8 247 15 C 247 22 237 22 235 15 Z" fill="#15803d"/>
+                            <path d="M 235 18 Q 241 15 244 11" stroke="#ffffff" stroke-width="1" fill="none"/>
+
+                            <!-- ECO- màu xanh lá -->
+                            <text x="90" y="48" font-family="'Plus Jakarta Sans', sans-serif" font-size="34" font-weight="800" fill="#15803d" letter-spacing="0.5">ECO-</text>
+                            
+                            <!-- SHARE màu xanh dương -->
+                            <text x="182" y="48" font-family="'Plus Jakarta Sans', sans-serif" font-size="34" font-weight="800" fill="#2563eb" letter-spacing="0.5">SHARE</text>
+
+                            <!-- Đường gạch chân gradient -->
+                            <defs>
+                                <linearGradient id="logo-line-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#15803d"/>
+                                    <stop offset="100%" stop-color="#2563eb"/>
+                                </linearGradient>
+                            </defs>
+                            <rect x="90" y="56" width="200" height="3" rx="1.5" fill="url(#logo-line-grad)"/>
+                        </g>
+                    </svg>
+                </div>
+
+                <!-- Navigation Tabs (Desktop) -->
+                <nav class="hidden md:flex space-x-1 lg:space-x-4 h-full items-center">
+                    <button onclick="switchTab('home')" id="tab-home" class="nav-btn active px-3 py-2 text-sm lg:text-base font-semibold text-slate-700 hover:text-brand-green transition-colors h-full flex items-center">Trang chủ</button>
+                    <button onclick="switchTab('driver')" id="tab-driver" class="nav-btn px-3 py-2 text-sm lg:text-base font-semibold text-slate-700 hover:text-brand-green transition-colors h-full flex items-center">Thông tin tài xế</button>
+                    <button onclick="switchTab('customer')" id="tab-customer" class="nav-btn px-3 py-2 text-sm lg:text-base font-semibold text-slate-700 hover:text-brand-green transition-colors h-full flex items-center">Thông tin khách hàng</button>
+                    <button onclick="switchTab('match')" id="tab-match" class="nav-btn px-3 py-2 text-sm lg:text-base font-semibold text-slate-700 hover:text-brand-green transition-colors h-full flex items-center">Tự động ghép chuyến</button>
+                    <button onclick="switchTab('registered')" id="tab-registered" class="nav-btn px-3 py-2 text-sm lg:text-base font-semibold text-slate-700 hover:text-brand-green transition-colors h-full flex items-center">Đã đăng ký</button>
+                </nav>
+
+                <!-- Action Button: Clear Data -->
+                <div class="flex items-center space-x-2">
+                    <button onclick="confirmClearData()" class="bg-red-600 hover:bg-red-700 text-white font-medium px-3 py-2 rounded-lg text-xs sm:text-sm flex items-center gap-1.5 shadow transition-all transform active:scale-95" title="Xóa tất cả dữ liệu cũ trong LocalStorage">
+                        <i class="fa-solid fa-trash-can"></i>
+                        <span class="hidden sm:inline">Xóa dữ liệu cũ</span>
+                    </button>
+                    
+                    <!-- Mobile Menu Button -->
+                    <button onclick="toggleMobileMenu()" class="md:hidden text-slate-700 hover:text-brand-green p-2 focus:outline-none">
+                        <i class="fa-solid fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-200 px-4 pt-2 pb-4 space-y-1 shadow-lg">
+            <button onclick="switchTab('home')" class="block w-full text-left px-3 py-2 rounded-md font-medium text-slate-700 hover:bg-slate-100 hover:text-brand-green">Trang chủ</button>
+            <button onclick="switchTab('driver')" class="block w-full text-left px-3 py-2 rounded-md font-medium text-slate-700 hover:bg-slate-100 hover:text-brand-green">Thông tin tài xế</button>
+            <button onclick="switchTab('customer')" class="block w-full text-left px-3 py-2 rounded-md font-medium text-slate-700 hover:bg-slate-100 hover:text-brand-green">Thông tin khách hàng</button>
+            <button onclick="switchTab('match')" class="block w-full text-left px-3 py-2 rounded-md font-medium text-slate-700 hover:bg-slate-100 hover:text-brand-green">Tự động ghép chuyến</button>
+            <button onclick="switchTab('registered')" class="block w-full text-left px-3 py-2 rounded-md font-medium text-slate-700 hover:bg-slate-100 hover:text-brand-green">Đã đăng ký</button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="flex-grow">
+
+        <!-- 1. TRANG CHỦ (HOME PAGE) -->
+        <section id="page-home" class="space-y-12 pb-12">
+            <!-- Banner Hoành Tráng -->
+            <div class="relative bg-gradient-to-r from-emerald-900 via-brand-green to-blue-900 text-white py-16 md:py-24 px-4 overflow-hidden shadow-xl">
+                <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+                <div class="max-w-6xl mx-auto text-center relative z-10 space-y-6">
+                    
+                    <!-- SVG Logo Banner -->
+                    <div class="flex justify-center mb-4">
+                        <svg width="280" height="70" viewBox="0 0 320 80" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-16 md:h-20 w-auto bg-white/95 p-3 rounded-2xl shadow-2xl backdrop-blur">
+                            <use href="#logo-icon"/>
+                            <use href="#logo-text"/>
+                        </svg>
+                    </div>
+
+                    <h1 class="text-3xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
+                        Hệ Thống Điều Phối Vận Tải Thông Minh
+                    </h1>
+                    <p class="text-lg md:text-2xl text-emerald-100 max-w-3xl mx-auto font-normal">
+                        Giải pháp tối ưu hóa chuyến xe - Tiết kiệm chi phí, giảm ô nhiễm môi trường, kết nối chặng đường <span class="underline stroke-emerald-400 font-semibold">Cảng Cái Cui ↔ Ninh Kiều, Cần Thơ</span>.
+                    </p>
+                    <div class="flex flex-wrap justify-center gap-4 pt-4">
+                        <button onclick="switchTab('driver')" class="bg-brand-green hover:bg-brand-greenHover text-white font-bold px-8 py-3.5 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 flex items-center gap-2">
+                            <i class="fa-solid fa-truck-fast"></i> Dành Cho Tài Xế
+                        </button>
+                        <button onclick="switchTab('customer')" class="bg-brand-blue hover:bg-brand-blueHover text-white font-bold px-8 py-3.5 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 flex items-center gap-2">
+                            <i class="fa-solid fa-box"></i> Dành Cho Khách Hàng
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Các Khối Tính Năng Nổi Bật -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-2xl md:text-4xl font-bold text-slate-800">Tính Năng Nổi Bật Của ECO-SHARE</h2>
+                    <p class="text-slate-600 mt-2">Nền tảng gắn kết chủ xe và khách hàng linh hoạt & an toàn</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Feature 1 -->
+                    <div class="bg-white rounded-2xl p-8 border border-slate-100 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                        <div class="w-14 h-14 bg-emerald-100 text-brand-green rounded-2xl flex items-center justify-center text-2xl font-bold mb-6">
+                            <i class="fa-solid fa-route"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-800 mb-3">Tuyến Đường Chuẩn Hóa</h3>
+                        <p class="text-slate-600 leading-relaxed">
+                            Tập trung tối ưu hóa hành trình cố định giữa <b>Cảng Cái Cui</b> và <b>Ninh Kiều, Cần Thơ</b>, giúp giảm tải giao thông nội đô và tối ưu vận tải.
+                        </p>
+                    </div>
+
+                    <!-- Feature 2 -->
+                    <div class="bg-white rounded-2xl p-8 border border-slate-100 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                        <div class="w-14 h-14 bg-blue-100 text-brand-blue rounded-2xl flex items-center justify-center text-2xl font-bold mb-6">
+                            <i class="fa-solid fa-microchip"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-800 mb-3">Ghép Đôi Thông Minh</h3>
+                        <p class="text-slate-600 leading-relaxed">
+                            Thuật toán khớp lệnh tự động phân tích thời gian xuất phát (khớp trong vòng 30 phút) và tải trọng xe tương thích với đơn hàng ngay lập tức.
+                        </p>
+                    </div>
+
+                    <!-- Feature 3 -->
+                    <div class="bg-white rounded-2xl p-8 border border-slate-100 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                        <div class="w-14 h-14 bg-emerald-100 text-brand-green rounded-2xl flex items-center justify-center text-2xl font-bold mb-6">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-800 mb-3">An Toàn & Tin Cậy</h3>
+                        <p class="text-slate-600 leading-relaxed">
+                            Thông tin tài xế, biển số xe và đơn hàng được minh bạch hóa hoàn toàn. Đảm bảo giao nhận đúng giờ, tối đa hiệu suất vận chuyển.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. TRANG ĐĂNG KÝ TÀI XẾ (DRIVER PAGE) -->
+        <section id="page-driver" class="hidden py-10">
+            <div class="max-w-3xl mx-auto px-4">
+                <div class="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
+                    <div class="bg-gradient-to-r from-emerald-800 to-brand-green text-white p-6 sm:p-8">
+                        <div class="flex items-center space-x-3">
+                            <i class="fa-solid fa-truck-moving text-3xl"></i>
+                            <div>
+                                <h2 class="text-2xl font-bold">Đăng Ký Đội Xe / Tài Xế</h2>
+                                <p class="text-emerald-100 text-sm mt-1">Cung cấp thông tin chuyến đi để tìm đơn hàng ghép phù hợp</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form id="driverForm" onsubmit="handleDriverRegister(event)" class="p-6 sm:p-8 space-y-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <!-- Họ tên -->
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">Họ và tên tài xế <span class="text-red-500">*</span></label>
+                                <input type="text" id="driverName" required placeholder="Nguyễn Văn A" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-green focus:border-brand-green outline-none transition">
+                            </div>
+
+                            <!-- SĐT -->
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">Số điện thoại <span class="text-red-500">*</span></label>
+                                <input type="tel" id="driverPhone" required placeholder="0901234567" pattern="[0-9]{10}" title="Vui lòng nhập đúng 10 chữ số" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-green focus:border-brand-green outline-none transition">
+                                <p class="text-xs text-slate-500 mt-1">Bắt buộc đúng 10 chữ số</p>
+                            </div>
+
+                            <!-- Biển số xe -->
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">Biển số xe <span class="text-red-500">*</span></label>
+                                <input type="text" id="driverPlate" required placeholder="65A-123.45" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-green focus:border-brand-green outline-none transition">
+                            </div>
+
+                            <!-- Tải trọng trống -->
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">Tải trọng trống <span class="text-red-500">*</span></label>
+                                <select id="driverCapacity" required class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-green focus:border-brand-green outline-none transition bg-white">
+                                    <option value="" disabled selected>-- Chọn mức tải trọng --</option>
+                                    <option value="S">Gói S (dưới 5kg) - Nhận 30.000 VND</option>
+                                    <option value="M">Gói M (5 - 15kg) - Nhận 40.000 VND</option>
+                                    <option value="L">Gói L (15 - 30kg) - Nhận 60.000 VND</option>
+                                </select>
+                            </div>
+
+                            <!-- Điểm xuất phát (Cố định) -->
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">Điểm xuất phát cố định</label>
+                                <input type="text" value="Cảng Cái Cui" disabled class="w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-100 font-semibold text-slate-600 cursor-not-allowed">
+                            </div>
+
+                            <!-- Điểm đến (Cố định) -->
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">Điểm đến cố định</label>
+                                <input type="text" value="Ninh Kiều, Cần Thơ" disabled class="w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-100 font-semibold text-slate-600 cursor-not-allowed">
+                            </div>
+
+                            <!-- Giờ khởi hành -->
+                            <div class="sm:col-span-2">
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">Giờ khởi hành dự kiến <span class="text-red-500">*</span></label>
+                                <input type="datetime-local" id="driverTime" required class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-green focus:border-brand-green outline-none transition">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full bg-brand-green hover:bg-brand-greenHover text-white font-bold py-3.5 rounded-xl shadow-lg transition-all transform active:scale-98 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-paper-plane"></i> Đăng Ký Chuyến Xe
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. TRANG ĐĂNG KÝ KHÁCH HÀNG (CUSTOMER PAGE) -->
+        <section id="page-customer" class="hidden py-10">
+            <div class="max-w-3xl mx-auto px-4">
+                <div class="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
+                    <div class="bg-gradient-to-r from-blue-800 to-brand-blue text-white p-6 sm:p-8">
+                        <div class="flex items-center space-x-3">
+                            <i class="fa-solid fa-box-open text-3xl"></i>
+                            <div>
+                                <h2 class="text-2xl font-bold">Đăng Ký Đơn Hàng Vận Chuyển</h2>
+                                <p class="text-blue-100 text-sm mt-1">Tạo yêu cầu gửi hàng để hệ thống tự động tìm xe phù hợp</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form id="customerForm" onsubmit="handleCustomerRegister(event)" class="p-6 sm:p-8 space-y-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <!-- Họ tên -->
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">Họ và tên người gửi <span class="text-red-500">*</span></label>
+                                <input type="text" id="custName" required placeholder="Trần Thị B" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-blue focus:border-brand-blue outline-none transition">
+                            </div>
+
+                            <!-- SĐT -->
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">Số điện thoại <span class="text-red-500">*</span></label>
+                                <input type="tel" id="custPhone" required placeholder="0987654321" pattern="[0-9]{10}" title="Vui lòng nhập đúng 10 chữ số" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-blue focus:border-brand-blue outline-none transition">
+                                <p class="text-xs text-slate-500 mt-1">Bắt buộc đúng 10 chữ số</p>
+                            </div>
+
+                            <!-- Điểm nhận cố định -->
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">Điểm nhận hàng cố định</label>
+                                <input type="text" value="Cảng Cái Cui" disabled class="w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-100 font-semibold text-slate-600 cursor-not-allowed">
+                            </div>
+
+                            <!-- Điểm giao cố định -->
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">Điểm giao hàng cố định</label>
+                                <input type="text" value="Ninh Kiều, Cần Thơ" disabled class="w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-100 font-semibold text-slate-600 cursor-not-allowed">
+                            </div>
+
+                            <!-- Khối lượng hàng -->
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">Khối lượng hàng <span class="text-red-500">*</span></label>
+                                <select id="custPackage" required class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-blue focus:border-brand-blue outline-none transition bg-white">
+                                    <option value="" disabled selected>-- Chọn mức khối lượng --</option>
+                                    <option value="S">Gói S (dưới 5kg) - 50.000 VND</option>
+                                    <option value="M">Gói M (5 - 15kg) - 60.000 VND</option>
+                                    <option value="L">Gói L (15 - 30kg) - 90.000 VND</option>
+                                </select>
+                            </div>
+
+                            <!-- Thời gian nhận hàng -->
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">Thời gian muốn nhận hàng <span class="text-red-500">*</span></label>
+                                <input type="datetime-local" id="custTime" required class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-blue focus:border-brand-blue outline-none transition">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full bg-brand-blue hover:bg-brand-blueHover text-white font-bold py-3.5 rounded-xl shadow-lg transition-all transform active:scale-98 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-cart-flatbed"></i> Tạo Đơn Hàng Vận Chuyển
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. TRANG TỰ ĐỘNG GHÉP CHUYẾN (MATCHING PAGE) -->
+        <section id="page-match" class="hidden py-10">
+            <div class="max-w-6xl mx-auto px-4">
+                <div class="bg-white rounded-2xl shadow-md p-6 border border-slate-100 mb-8 flex flex-wrap justify-between items-center gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-800">Kết Quả Ghép Chuyến Tự Động</h2>
+                        <p class="text-slate-600 text-sm">Hệ thống áp dụng thuật toán ghép đôi 1-1 chính xác (Chênh lệch ≤ 30 phút & Tải trọng phù hợp)</p>
+                    </div>
+                    <button onclick="runAutoMatchingAlgorithm(); renderMatchingPage();" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2 rounded-lg text-sm transition flex items-center gap-2">
+                        <i class="fa-solid fa-arrows-rotate"></i> Làm mới tự động
+                    </button>
+                </div>
+
+                <!-- Danh sách các cặp đã ghép thành công -->
+                <div id="match-list" class="space-y-4">
+                    <!-- Javascript rendered content -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. TRANG ĐÃ ĐĂNG KÝ (REGISTERED PAGE) -->
+        <section id="page-registered" class="hidden py-10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+                
+                <!-- Thanh Bộ Lọc Nâng Cao -->
+                <div class="bg-white p-6 rounded-2xl shadow-md border border-slate-100 flex flex-wrap justify-between items-center gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-800">Quản Lý Danh Sách Đăng Ký</h2>
+                        <p class="text-slate-600 text-sm">Theo dõi toàn bộ thông tin tài xế và khách hàng đã lưu trên hệ thống</p>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <label class="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                            <i class="fa-solid fa-filter text-brand-green"></i> Lọc trạng thái:
+                        </label>
+                        <select id="statusFilter" onchange="renderRegisteredPage()" class="px-4 py-2 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-brand-green text-sm font-medium bg-white">
+                            <option value="ALL">-- Tất cả trạng thái --</option>
+                            <option value="Chờ ghép">Chờ ghép</option>
+                            <option value="Đã ghép">Đã ghép</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Bảng 1: Danh sách Tài Xế -->
+                <div class="bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden">
+                    <div class="bg-emerald-700 text-white px-6 py-4 flex justify-between items-center">
+                        <h3 class="text-lg font-bold flex items-center gap-2">
+                            <i class="fa-solid fa-truck"></i> Danh Sách Tài Xế / Đội Xe
+                        </h3>
+                        <span id="driverCount" class="bg-white/20 text-white text-xs px-2.5 py-1 rounded-full font-semibold">0</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-700 text-xs uppercase font-bold tracking-wider border-b border-slate-200">
+                                    <th class="p-4">STT</th>
+                                    <th class="p-4">Họ và Tên</th>
+                                    <th class="p-4">SĐT</th>
+                                    <th class="p-4">Biển Số Xe</th>
+                                    <th class="p-4">Tải Trọng Trống</th>
+                                    <th class="p-4">Lộ Trình</th>
+                                    <th class="p-4">Giờ Khởi Hành</th>
+                                    <th class="p-4">Trạng Thái</th>
+                                </tr>
+                            </thead>
+                            <tbody id="driverTableBody" class="divide-y divide-slate-100 text-sm">
+                                <!-- Render dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Bảng 2: Danh sách Khách Hàng -->
+                <div class="bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden">
+                    <div class="bg-blue-700 text-white px-6 py-4 flex justify-between items-center">
+                        <h3 class="text-lg font-bold flex items-center gap-2">
+                            <i class="fa-solid fa-boxes-packing"></i> Danh Sách Khách Hàng / Đơn Hàng
+                        </h3>
+                        <span id="custCount" class="bg-white/20 text-white text-xs px-2.5 py-1 rounded-full font-semibold">0</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-700 text-xs uppercase font-bold tracking-wider border-b border-slate-200">
+                                    <th class="p-4">STT</th>
+                                    <th class="p-4">Họ và Tên</th>
+                                    <th class="p-4">SĐT</th>
+                                    <th class="p-4">Khối Lượng Hàng</th>
+                                    <th class="p-4">Lộ Trình</th>
+                                    <th class="p-4">Thời Gian Nhận</th>
+                                    <th class="p-4">Trạng Thái</th>
+                                </tr>
+                            </thead>
+                            <tbody id="custTableBody" class="divide-y divide-slate-100 text-sm">
+                                <!-- Render dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-900 text-slate-400 py-8 border-t border-slate-800 mt-12">
+        <div class="max-w-7xl mx-auto px-4 text-center space-y-3">
+            <p class="text-sm">© 2026 ECO-SHARE. Hệ Thống Điều Phối Vận Tải Thông Minh. Bảo lưu mọi quyền.</p>
+            <p class="text-xs text-slate-500">Tuyến đường chuẩn hóa: Cảng Cái Cui ↔ Ninh Kiều, Cần Thơ</p>
+        </div>
+    </footer>
+
+    <!-- MODAL CHI TIẾT KẾT NỐI -->
+    <div id="detailModal" class="modal opacity-0 pointer-events-none fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden transform transition-all">
+            <div class="bg-gradient-to-r from-emerald-700 to-blue-700 text-white px-6 py-4 flex justify-between items-center">
+                <h3 class="text-lg font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-circle-check text-emerald-300"></i> Chi Tiết Kết Nối Ghép Chuyến
+                </h3>
+                <button onclick="closeModal()" class="text-white/80 hover:text-white text-xl font-bold">&times;</button>
+            </div>
+            <div id="modalContent" class="p-6 space-y-4 text-sm">
+                <!-- Inner HTML updated via JavaScript -->
+            </div>
+            <div class="bg-slate-50 px-6 py-3 flex justify-end">
+                <button onclick="closeModal()" class="bg-slate-700 hover:bg-slate-800 text-white font-medium px-5 py-2 rounded-lg transition">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT SYSTEM LOGIC -->
+    <script>
+        // Lớp trọng số gói hàng để so sánh thuật toán ghép chuyến (S=1, M=2, L=3)
+        const CAPACITY_WEIGHT = { 'S': 1, 'M': 2, 'L': 3 };
+
+        // Tên hiển thị gói
+        const PACKAGE_NAMES = {
+            'S': 'Gói S (dưới 5kg)',
+            'M': 'Gói M (5 - 15kg)',
+            'L': 'Gói L (15 - 30kg)'
+        };
+
+        // Khởi tạo LocalStorage nếu chưa có
+        function initStorage() {
+            if (!localStorage.getItem('eco_drivers')) {
+                localStorage.setItem('eco_drivers', JSON.stringify([]));
+            }
+            if (!localStorage.getItem('eco_customers')) {
+                localStorage.setItem('eco_customers', JSON.stringify([]));
+            }
+            if (!localStorage.getItem('eco_matches')) {
+                localStorage.setItem('eco_matches', JSON.stringify([]));
+            }
+        }
+
+        // Lấy dữ liệu từ LocalStorage
+        function getDrivers() { return JSON.parse(localStorage.getItem('eco_drivers')) || []; }
+        function getCustomers() { return JSON.parse(localStorage.getItem('eco_customers')) || []; }
+        function getMatches() { return JSON.parse(localStorage.getItem('eco_matches')) || []; }
+
+        // Lưu dữ liệu vào LocalStorage
+        function saveDrivers(data) { localStorage.setItem('eco_drivers', JSON.stringify(data)); }
+        function saveCustomers(data) { localStorage.setItem('eco_customers', JSON.stringify(data)); }
+        function saveMatches(data) { localStorage.setItem('eco_matches', JSON.stringify(data)); }
+
+        // Chuyển Tab Trang
+        function switchTab(tabName) {
+            const tabs = ['home', 'driver', 'customer', 'match', 'registered'];
+            tabs.forEach(tab => {
+                document.getElementById(`page-${tab}`).classList.add('hidden');
+                const btn = document.getElementById(`tab-${tab}`);
+                if (btn) btn.classList.remove('active');
+            });
+
+            document.getElementById(`page-${tabName}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-${tabName}`);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            // Đóng mobile menu nếu mở
+            document.getElementById('mobile-menu').classList.add('hidden');
+
+            // Render lại các bảng / dữ liệu khi chuyển trang
+            if (tabName === 'match') {
+                runAutoMatchingAlgorithm();
+                renderMatchingPage();
+            } else if (tabName === 'registered') {
+                renderRegisteredPage();
+            }
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Toggle Mobile Menu
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+
+        // 1. ĐĂNG KÝ TÀI XẾ
+        function handleDriverRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('driverName').value.trim();
+            const phone = document.getElementById('driverPhone').value.trim();
+            const plate = document.getElementById('driverPlate').value.trim();
+            const capacity = document.getElementById('driverCapacity').value;
+            const time = document.getElementById('driverTime').value;
+
+            if (phone.length !== 10 || !/^\d+$/.test(phone)) {
+                alert("Số điện thoại phải có đúng 10 chữ số!");
+                return;
+            }
+
+            const drivers = getDrivers();
+            const newDriver = {
+                id: 'DRV_' + Date.now(),
+                name,
+                phone,
+                plate,
+                capacity,
+                startPoint: 'Cảng Cái Cui',
+                endPoint: 'Ninh Kiều, Cần Thơ',
+                time,
+                status: 'Chờ ghép',
+                createdAt: new Date().toISOString()
+            };
+
+            drivers.push(newDriver);
+            saveDrivers(drivers);
+
+            // Chạy thuật toán tự động ghép ngay khi có dữ liệu mới
+            runAutoMatchingAlgorithm();
+
+            alert('Đăng ký tài xế thành công! Hệ thống đang tự động ghép chuyến.');
+            document.getElementById('driverForm').reset();
+            switchTab('registered');
+        }
+
+        // 2. ĐĂNG KÝ KHÁCH HÀNG
+        function handleCustomerRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('custName').value.trim();
+            const phone = document.getElementById('custPhone').value.trim();
+            const packageSize = document.getElementById('custPackage').value;
+            const time = document.getElementById('custTime').value;
+
+            if (phone.length !== 10 || !/^\d+$/.test(phone)) {
+                alert("Số điện thoại phải có đúng 10 chữ số!");
+                return;
+            }
+
+            const customers = getCustomers();
+            const newCustomer = {
+                id: 'CUST_' + Date.now(),
+                name,
+                phone,
+                packageSize,
+                startPoint: 'Cảng Cái Cui',
+                endPoint: 'Ninh Kiều, Cần Thơ',
+                time,
+                status: 'Chờ ghép',
+                createdAt: new Date().toISOString()
+            };
+
+            customers.push(newCustomer);
+            saveCustomers(customers);
+
+            // Chạy thuật toán ghép chuyến tự động ngay
+            runAutoMatchingAlgorithm();
+
+            alert('Đăng ký đơn hàng thành công! Hệ thống đang tự động tìm kiếm xe ghép phù hợp.');
+            document.getElementById('customerForm').reset();
+            switchTab('registered');
+        }
+
+        // 3. THUẬT TOÁN TỰ ĐỘNG GHÉP CHUYẾN THÔNG MINH 1-1
+        function runAutoMatchingAlgorithm() {
+            let drivers = getDrivers();
+            let customers = getCustomers();
+            let matches = getMatches();
+
+            let hasNewMatch = false;
+
+            // Lọc danh sách còn "Chờ ghép"
+            const waitingDrivers = drivers.filter(d => d.status === 'Chờ ghép');
+            const waitingCustomers = customers.filter(c => c.status === 'Chờ ghép');
+
+            waitingDrivers.forEach(driver => {
+                // Nếu tài xế vừa được ghép trong vòng lặp trước thì bỏ qua
+                if (driver.status === 'Đã ghép') return;
+
+                const driverTimeMs = new Date(driver.time).getTime();
+                const driverWeight = CAPACITY_WEIGHT[driver.capacity];
+
+                for (let i = 0; i < waitingCustomers.length; i++) {
+                    const cust = waitingCustomers[i];
+                    if (cust.status === 'Đã ghép') continue;
+
+                    const custTimeMs = new Date(cust.time).getTime();
+                    const custWeight = CAPACITY_WEIGHT[cust.packageSize];
+
+                    // ĐIỀU KIỆN 1: Chênh lệch thời gian <= 30 phút (30 * 60 * 1000 = 1800000ms)
+                    const timeDiffMin = Math.abs(driverTimeMs - custTimeMs) / (1000 * 60);
+
+                    // ĐIỀU KIỆN 2: Tải trọng trống của xe >= Khối lượng hàng của khách
+                    const isCapacityValid = driverWeight >= custWeight;
+
+                    if (timeDiffMin <= 30 && isCapacityValid) {
+                        // CẶP KHỚP LỆNH THÀNH CÔNG!
+                        driver.status = 'Đã ghép';
+                        cust.status = 'Đã ghép';
+
+                        const newMatch = {
+                            id: 'MATCH_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
+                            driverId: driver.id,
+                            driverName: driver.name,
+                            driverPhone: driver.phone,
+                            driverPlate: driver.plate,
+                            driverCapacity: driver.capacity,
+                            driverTime: driver.time,
+                            
+                            customerId: cust.id,
+                            customerName: cust.name,
+                            customerPhone: cust.phone,
+                            customerPackage: cust.packageSize,
+                            customerTime: cust.time,
+
+                            matchedAt: new Date().toLocaleString('vi-VN'),
+                            timeDiff: Math.round(timeDiffMin)
+                        };
+
+                        matches.push(newMatch);
+                        hasNewMatch = true;
+                        break; // Thoát vòng lặp khách hàng vì 1-1
+                    }
+                }
+            });
+
+            if (hasNewMatch) {
+                saveDrivers(drivers);
+                saveCustomers(customers);
+                saveMatches(matches);
+            }
+        }
+
+        // RENDER TRANG TỰ ĐỘNG GHÉP CHUYẾN
+        function renderMatchingPage() {
+            const matches = getMatches();
+            const container = document.getElementById('match-list');
+
+            if (matches.length === 0) {
+                // Nếu không có cặp nào khớp, hiển thị một dòng thông báo màu đỏ gọn gàng theo đúng yêu cầu
+                container.innerHTML = `
+                    <div class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-lg shadow-sm text-sm font-medium flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-circle-exclamation text-red-500 text-lg"></i>
+                            <span>Hiện chưa có cặp tài xế và khách hàng nào thỏa mãn điều kiện ghép đôi (Chênh lệch ≤ 30 phút & Tải trọng phù hợp).</span>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = matches.map((m, index) => `
+                <div class="bg-white rounded-2xl p-6 shadow-md border border-slate-100 hover:shadow-lg transition-all flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                    <div class="flex-1 space-y-3">
+                        <div class="flex items-center gap-2">
+                            <span class="bg-emerald-100 text-brand-green font-bold text-xs px-3 py-1 rounded-full">Cặp #${index + 1}</span>
+                            <span class="text-xs text-slate-500"><i class="fa-regular fa-clock"></i> Khớp lúc: ${m.matchedAt} (Độ lệch: ${m.timeDiff} phút)</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                            <!-- Driver Info -->
+                            <div class="bg-emerald-50/60 p-3.5 rounded-xl border border-emerald-100">
+                                <span class="text-xs font-bold text-emerald-800 uppercase tracking-wider block mb-1">
+                                    <i class="fa-solid fa-truck"></i> Tài xế
+                                </span>
+                                <p class="font-bold text-slate-800">${m.driverName}</p>
+                                <p class="text-xs text-slate-600">SĐT: ${m.driverPhone} | Xe: <span class="font-semibold">${m.driverPlate}</span></p>
+                                <p class="text-xs text-slate-600">Tải: ${PACKAGE_NAMES[m.driverCapacity]}</p>
+                                <p class="text-xs text-slate-500 mt-1">Giờ đi: ${new Date(m.driverTime).toLocaleString('vi-VN')}</p>
+                            </div>
+
+                            <!-- Customer Info -->
+                            <div class="bg-blue-50/60 p-3.5 rounded-xl border border-blue-100">
+                                <span class="text-xs font-bold text-blue-800 uppercase tracking-wider block mb-1">
+                                    <i class="fa-solid fa-box"></i> Khách hàng
+                                </span>
+                                <p class="font-bold text-slate-800">${m.customerName}</p>
+                                <p class="text-xs text-slate-600">SĐT: ${m.customerPhone}</p>
+                                <p class="text-xs text-slate-600">Hàng: ${PACKAGE_NAMES[m.customerPackage]}</p>
+                                <p class="text-xs text-slate-500 mt-1">Giờ nhận: ${new Date(m.customerTime).toLocaleString('vi-VN')}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick='openMatchDetailModal(${JSON.stringify(m)})' class="w-full md:w-auto bg-brand-green hover:bg-brand-greenHover text-white text-sm font-semibold px-5 py-3 rounded-xl shadow transition flex items-center justify-center gap-2 whitespace-nowrap">
+                        <i class="fa-solid fa-eye"></i> Xem Chi Tiết Kết Nối
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // RENDER TRANG ĐÃ ĐĂNG KÝ (BẢNG & BỘ LỌC NÂNG CAO)
+        function renderRegisteredPage() {
+            const filter = document.getElementById('statusFilter').value;
+            let drivers = getDrivers();
+            let customers = getCustomers();
+
+            if (filter !== 'ALL') {
+                drivers = drivers.filter(d => d.status === filter);
+                customers = customers.filter(c => c.status === filter);
+            }
+
+            document.getElementById('driverCount').innerText = drivers.length;
+            document.getElementById('custCount').innerText = customers.length;
+
+            // Render Bảng Tài Xế
+            const driverTbody = document.getElementById('driverTableBody');
+            if (drivers.length === 0) {
+                driverTbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-400">Không có dữ liệu tài xế</td></tr>`;
+            } else {
+                driverTbody.innerHTML = drivers.map((d, index) => `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-4 font-semibold text-slate-500">${index + 1}</td>
+                        <td class="p-4 font-bold text-slate-800">${d.name}</td>
+                        <td class="p-4">${d.phone}</td>
+                        <td class="p-4 font-semibold text-slate-700">${d.plate}</td>
+                        <td class="p-4"><span class="bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md font-medium text-xs">${PACKAGE_NAMES[d.capacity]}</span></td>
+                        <td class="p-4 text-xs font-semibold text-slate-600">${d.startPoint} ➔ ${d.endPoint}</td>
+                        <td class="p-4 text-xs text-slate-500">${new Date(d.time).toLocaleString('vi-VN')}</td>
+                        <td class="p-4">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold ${d.status === 'Đã ghép' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">
+                                ${d.status}
+                            </span>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            // Render Bảng Khách Hàng
+            const custTbody = document.getElementById('custTableBody');
+            if (customers.length === 0) {
+                custTbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400">Không có dữ liệu khách hàng</td></tr>`;
+            } else {
+                custTbody.innerHTML = customers.map((c, index) => `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-4 font-semibold text-slate-500">${index + 1}</td>
+                        <td class="p-4 font-bold text-slate-800">${c.name}</td>
+                        <td class="p-4">${c.phone}</td>
+                        <td class="p-4"><span class="bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md font-medium text-xs">${PACKAGE_NAMES[c.packageSize]}</span></td>
+                        <td class="p-4 text-xs font-semibold text-slate-600">${c.startPoint} ➔ ${c.endPoint}</td>
+                        <td class="p-4 text-xs text-slate-500">${new Date(c.time).toLocaleString('vi-VN')}</td>
+                        <td class="p-4">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold ${c.status === 'Đã ghép' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700'}">
+                                ${c.status}
+                            </span>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        // 4. HIỂN THỊ MODAL CHI TIẾT KẾT NỐI
+        function openMatchDetailModal(m) {
+            const content = `
+                <div class="space-y-4">
+                    <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                        <p class="text-xs text-slate-500">Mã kết nối: <span class="font-mono font-bold text-slate-700">${m.id}</span></p>
+                        <p class="text-xs text-slate-500">Thời gian ghép đôi: <span class="font-semibold text-slate-700">${m.matchedAt}</span></p>
+                        <p class="text-xs text-slate-500">Độ lệch giờ xuất phát/nhận: <span class="font-bold text-emerald-600">${m.timeDiff} phút</span> (Chuẩn ≤ 30 phút)</p>
+                    </div>
+
+                    <!-- Lộ trình -->
+                    <div class="border border-slate-200 rounded-xl p-3.5 bg-emerald-50/40">
+                        <h4 class="font-bold text-xs uppercase text-slate-500 tracking-wider mb-1">Tuyến đường cố định:</h4>
+                        <p class="font-bold text-brand-green flex items-center gap-2">
+                            <i class="fa-solid fa-location-dot"></i> Cảng Cái Cui ➔ Ninh Kiều, Cần Thơ
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-100">
+                            <h4 class="font-bold text-emerald-800 text-sm mb-2"><i class="fa-solid fa-truck"></i> Bên Vận Chuyển</h4>
+                            <p class="text-xs"><b>Tài xế:</b> ${m.driverName}</p>
+                            <p class="text-xs"><b>SĐT:</b> <a href="tel:${m.driverPhone}" class="text-blue-600 underline">${m.driverPhone}</a></p>
+                            <p class="text-xs"><b>Biển số:</b> ${m.driverPlate}</p>
+                            <p class="text-xs"><b>Mức tải:</b> ${PACKAGE_NAMES[m.driverCapacity]}</p>
+                        </div>
+                        
+                        <div class="p-3 bg-blue-50 rounded-xl border border-blue-100">
+                            <h4 class="font-bold text-blue-800 text-sm mb-2"><i class="fa-solid fa-box"></i> Bên Gửi Hàng</h4>
+                            <p class="text-xs"><b>Khách hàng:</b> ${m.customerName}</p>
+                            <p class="text-xs"><b>SĐT:</b> <a href="tel:${m.customerPhone}" class="text-blue-600 underline">${m.customerPhone}</a></p>
+                            <p class="text-xs"><b>Gói hàng:</b> ${PACKAGE_NAMES[m.customerPackage]}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('modalContent').innerHTML = content;
+            const modal = document.getElementById('detailModal');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            document.body.classList.add('modal-active');
+        }
+
+        // Đóng Modal
+        function closeModal() {
+            const modal = document.getElementById('detailModal');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            document.body.classList.remove('modal-active');
+        }
+
+        // 5. XÓA DỮ LIỆU CŨ
+        function confirmClearData() {
+            if (confirm('Bạn có chắc chắn muốn xóa toàn bộ dữ liệu tài xế, khách hàng và lịch sử ghép chuyến trên hệ thống không? Action này không thể hoàn tác!')) {
+                localStorage.removeItem('eco_drivers');
+                localStorage.removeItem('eco_customers');
+                localStorage.removeItem('eco_matches');
+                initStorage();
+                alert('Đã xóa toàn bộ dữ liệu thành công!');
+                
+                // Cập nhật lại UI nếu đang mở các tab bảng
+                renderMatchingPage();
+                renderRegisteredPage();
+            }
+        }
+
+        // KHỞI CHẠY HỆ THỐNG KHI TẢI TRANG
+        window.onload = function() {
+            initStorage();
+            runAutoMatchingAlgorithm();
+        };
+    </script>
+</body>
+</html>
